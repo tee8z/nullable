@@ -3,6 +3,8 @@ package nullable
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"fmt"
+	"unicode/utf8"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -21,6 +23,10 @@ func NewString(value *string) String {
 			realValue: "",
 			isValid:   false,
 		}
+	}
+	isValid := utf8.Valid([]byte(*value))
+	if !isValid {
+		*value = fmt.Sprintf("%q", *value)
 	}
 	return String{
 		realValue: *value,
@@ -85,6 +91,7 @@ func (n String) Value() (driver.Value, error) {
 	if !n.isValid {
 		return nil, nil
 	}
+
 	return n.realValue, nil
 }
 
