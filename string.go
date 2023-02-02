@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -23,10 +24,12 @@ func NewString(value *string) String {
 			isValid:   false,
 		}
 	}
-	// ensures we always get valid utf8 strings
-	utf8Safe := fmt.Sprintf("%q", *value)
+	isValid := utf8.Valid([]byte(*value))
+	if !isValid {
+		*value = fmt.Sprintf("%q", *value)
+	}
 	return String{
-		realValue: utf8Safe,
+		realValue: *value,
 		isValid:   true,
 	}
 }
@@ -88,6 +91,7 @@ func (n String) Value() (driver.Value, error) {
 	if !n.isValid {
 		return nil, nil
 	}
+
 	return n.realValue, nil
 }
 
