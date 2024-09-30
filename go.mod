@@ -1,6 +1,6 @@
 module github.com/tee8z/nullable
 
-go 1.15
+go 1.23
 
 require (
 	golang.org/x/text v0.18.0 // indirect
